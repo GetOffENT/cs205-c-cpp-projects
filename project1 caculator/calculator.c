@@ -29,11 +29,14 @@ BigNum add(BigNum *a, BigNum *b);
 BigNum subtract(BigNum *a, BigNum *b, int com);
 
 BigNum multiply(BigNum *a, BigNum *b);
-
+// 对小数位数进行补全
 void padDecimalPlaces(BigNum *bigNum, int newDecimalLength);
+// 调整指数大小 把指数大的调整为和指数小的一致
+void adjustExponent(BigNum *bigNum, int newExponent);
 BigNum addBigNum(BigNum *a, BigNum *b);
 BigNum subtractBigNum(BigNum *a, BigNum *b);
 BigNum multiplyBigNum(BigNum *a, BigNum *b);
+// 计算a/b ，c表示商，d表示余数
 void divideBigNum(BigNum *a, BigNum *b, BigNum *c, BigNum *d, int scale);
 
 void calculate(char *operator1, char *operator, char * operator2, int scale);
@@ -53,20 +56,33 @@ typedef struct
     char items[STACK_SIZE];
     int top;
 } OperatorStack;
-
+// 初始化 BigNum栈
 void initBigNumStack(BigNumStack *stack);
+// 初始化运算符栈
 void initOperatorStack(OperatorStack *stack);
+// BigNum入栈操作
 void pushBigNum(BigNumStack *stack, BigNum num);
+// BigNum弹栈操作
 BigNum popBigNum(BigNumStack *stack);
+// 运算符入栈操作
 void pushOperator(OperatorStack *stack, char op);
+// 运算符弹栈操作
 char popOperator(OperatorStack *stack);
+// 访问运算符栈栈顶元素
 char peekOperator(OperatorStack *stack);
+// 判断运算符栈是否为空
 int isOperatorStackEmpty(OperatorStack *stack);
+// 返回运算符优先级，数字越大优先级越高
 int precedence(char op);
+// 对BigNum进行运算(和calculate()类似，参数不同)
 BigNum performOperation(BigNum *a, BigNum *b, char op);
-void evaluateExpression(char *expression);
-void standardMode();
+// 去除表达式中的空格
 void removeSpaces(char *str);
+// 处理表达式
+void evaluateExpression(char *expression);
+// 标准模式
+void standardMode();
+// 表达式模式
 void expressionMode();
 
 int main(int argc, char *argv[])
@@ -510,7 +526,6 @@ BigNum subtract(BigNum *a, BigNum *b, int com)
     return result;
 }
 
-// 对小数位数进行补全
 void padDecimalPlaces(BigNum *bigNum, int newDecimalLength)
 {
     if (newDecimalLength <= bigNum->decimal_length)
@@ -533,7 +548,7 @@ void padDecimalPlaces(BigNum *bigNum, int newDecimalLength)
     bigNum->decimal_length = newDecimalLength;
     bigNum->length = newLength;
 }
-// 调整指数大小 把指数大的调整为和指数小的一致
+
 void adjustExponent(BigNum *bigNum, int newExponent)
 {
     if (newExponent >= bigNum->exponent)
@@ -741,7 +756,6 @@ int isBigNumZero(const BigNum *num)
     return 1;
 }
 
-// 计算a/b ，c表示商，d表示余数
 void divideBigNum(BigNum *a, BigNum *b, BigNum *c, BigNum *d, int scale)
 {
     // 计算到保留位数的后一位
@@ -805,6 +819,7 @@ void divideBigNum(BigNum *a, BigNum *b, BigNum *c, BigNum *d, int scale)
     d->exponent = 0;
     ArrayToBigNum(remainder, d, start, dividend_length);
 }
+// 判断是否含e
 int hasENotation(char *operator)
 {
     for (size_t i = 0; i < strlen(operator); i++)
@@ -869,19 +884,16 @@ void calculate(char *operator1, char *operator, char * operator2, int scale)
     freeBigNum(&result);
 }
 
-// 初始化 BigNum栈
 void initBigNumStack(BigNumStack *stack)
 {
     stack->top = -1;
 }
 
-// 初始化运算符栈
 void initOperatorStack(OperatorStack *stack)
 {
     stack->top = -1;
 }
 
-// BigNum入栈操作
 void pushBigNum(BigNumStack *stack, BigNum num)
 {
     if (stack->top < STACK_SIZE - 1)
@@ -893,7 +905,7 @@ void pushBigNum(BigNumStack *stack, BigNum num)
         printf("BigNum Stack overflow\n");
     }
 }
-// BigNum弹栈操作
+
 BigNum popBigNum(BigNumStack *stack)
 {
     if (stack->top >= 0)
@@ -907,7 +919,6 @@ BigNum popBigNum(BigNumStack *stack)
     }
 }
 
-// 运算符入栈操作
 void pushOperator(OperatorStack *stack, char op)
 {
     if (stack->top < STACK_SIZE - 1)
@@ -919,7 +930,7 @@ void pushOperator(OperatorStack *stack, char op)
         printf("Operator Stack overflow\n");
     }
 }
-// 运算符弹栈操作
+
 char popOperator(OperatorStack *stack)
 {
     if (stack->top >= 0)
@@ -932,7 +943,7 @@ char popOperator(OperatorStack *stack)
         return '\0';
     }
 }
-// 访问运算符栈栈顶元素
+
 char peekOperator(OperatorStack *stack)
 {
     if (stack->top >= 0)
@@ -944,12 +955,12 @@ char peekOperator(OperatorStack *stack)
         return '\0';
     }
 }
-// 判断运算符栈是否为空
+
 int isOperatorStackEmpty(OperatorStack *stack)
 {
     return stack->top == -1;
 }
-// 返回运算符优先级，数字越大优先级越高
+
 int precedence(char op)
 {
     switch (op)
@@ -964,7 +975,7 @@ int precedence(char op)
         return -1;
     }
 }
-// 对BigNum进行运算(和calculate()类似，参数不同)
+
 BigNum performOperation(BigNum *a, BigNum *b, char op)
 {
     BigNum result;
@@ -995,7 +1006,6 @@ BigNum performOperation(BigNum *a, BigNum *b, char op)
     return result;
 }
 
-// 去除表达式中的空格
 void removeSpaces(char *str)
 {
     int i = 0, j = 0;
@@ -1009,7 +1019,7 @@ void removeSpaces(char *str)
     }
     str[j] = '\0'; // 添加字符串结束符
 }
-// 处理表达式
+
 void evaluateExpression(char *expression)
 {
     char initExpression[strlen(expression)];
@@ -1112,7 +1122,7 @@ void evaluateExpression(char *expression)
     printBigNum(&finalResult, finalResult.decimal_length >= 6 ? 6 : -1, 0);
     freeBigNum(&finalResult);
 }
-// 标准模式
+
 void standardMode()
 {
     printf("Standard Mode!\n");
@@ -1170,7 +1180,7 @@ void standardMode()
         }
     }
 }
-// 表达式模式
+
 void expressionMode()
 {
     printf("Expression Mode!\n");
