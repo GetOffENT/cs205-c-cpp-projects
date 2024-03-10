@@ -839,7 +839,7 @@ void calculate(char *operator1, char *operator, char * operator2, int scale)
     BigNum result;
     BigNum temp;
 
-    if (*operator== '/' && isBigNumZero(&b))
+    if ((*operator== '/' || *operator== '%') && isBigNumZero(&b))
     {
         printf("A number cannot be divied by zero!\n");
         freeBigNum(&a);
@@ -1059,7 +1059,7 @@ void evaluateExpression(char *expression)
                 BigNum b = popBigNum(&numbers);
                 BigNum a = popBigNum(&numbers);
                 char op = popOperator(&operators);
-                if (op == '/' && isBigNumZero(&b))
+                if ((op == '/' || op == '%') && isBigNumZero(&b))
                 {
                     printf("A number cannot be divied by zero!\n");
                     freeBigNum(&a);
@@ -1081,7 +1081,7 @@ void evaluateExpression(char *expression)
                 BigNum b = popBigNum(&numbers);
                 BigNum a = popBigNum(&numbers);
                 char op = popOperator(&operators);
-                if (op == '/' && isBigNumZero(&b))
+                if ((op == '/' || op == '%') && isBigNumZero(&b))
                 {
                     printf("A number cannot be divied by zero!\n");
                     freeBigNum(&a);
@@ -1103,7 +1103,7 @@ void evaluateExpression(char *expression)
         BigNum b = popBigNum(&numbers);
         BigNum a = popBigNum(&numbers);
         char op = popOperator(&operators);
-        if (op == '/' && isBigNumZero(&b))
+        if ((op == '/' || op == '%') && isBigNumZero(&b))
         {
             printf("A number cannot be divied by zero!\n");
             freeBigNum(&a);
