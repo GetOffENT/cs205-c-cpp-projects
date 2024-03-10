@@ -915,7 +915,7 @@ BigNum popBigNum(BigNumStack *stack)
     else
     {
         printf("BigNum Stack underflow\n");
-        return (BigNum){NULL, 0, 0}; // 返回一个空的BigNum作为错误指示
+        return (BigNum){NULL, 0, 0, 0, 0}; // 返回一个空的BigNum作为错误指示
     }
 }
 
@@ -1030,7 +1030,7 @@ void evaluateExpression(char *expression)
     initBigNumStack(&numbers);
     initOperatorStack(&operators);
 
-    for (int i = 0; i < strlen(expression); ++i)
+    for (size_t i = 0; i < strlen(expression); ++i)
     {
         if (isdigit(expression[i]))
         {
