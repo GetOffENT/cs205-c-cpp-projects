@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "utility": "cpp",
+        "stddef.h": "c",
+        "matrix.h": "c",
+        "cblas.h": "c",
+        "stdlib.h": "c",
+        "stdio.h": "c",
+        "array": "c",
+        "string": "c",
+        "string_view": "c"
+    }
+}

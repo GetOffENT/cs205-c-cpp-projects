@@ -1,0 +1,9 @@
+-------------------------------------------------------------
+Benchmark                   Time             CPU   Iterations
+-------------------------------------------------------------
+BM_GEMM_CBLAS/16          562 ns          562 ns      1266247
+BM_GEMM_CBLAS/128       45320 ns        45283 ns        16511
+BM_GEMM_CBLAS/1024    8605207 ns      8605032 ns           71
+BM_GEMM_CBLAS/8192 4150837604 ns   4069534500 ns            1
+BM_GEMM_CBLAS_BigO       0.01 N^3        0.01 N^3  
+BM_GEMM_CBLAS_RMS           0 %             0 %    
