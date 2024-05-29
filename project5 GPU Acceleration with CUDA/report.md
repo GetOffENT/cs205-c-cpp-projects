@@ -10,12 +10,12 @@
 
 上交文档：matrix.h、mulAdd.cu、mul.cu、benchmark.cu、report.pdf
 
-- **matrix.h：**
-- **mulAdd.cu：**
-- **mul.cu：**
-- **benchmark.cu:**
+- **matrix.h：**简易的矩阵类
+- **mulAdd.cu：**实现**B** = a **A** + b
+- **mul.cu：**实现OpenBLAS 库在 CPU 上的计算和cuBLAS 库在 GPU 上的计算
+- **benchmark.cu:** 对于mul.cu实现的函数进行单元基准测试，从而比对CPU和GPU在矩阵乘法计算上的优劣。
 
-[git仓库](https://github.com/GetOffENT/cs205-c-cpp-projects/tree/main/project3 Improved Matrix Multiplication)点此
+[git仓库](https://github.com/GetOffENT/cs205-c-cpp-projects/tree/main/project5 GPU Acceleration with CUDA)点此
 
 编译命令：
 
@@ -103,7 +103,9 @@ CUDA是通过函数类型限定词区别在host和device上的函数，主要的
 
 ### 1.3 测试前的推测和猜想
 
-TODO
+GPU拥有成千上万的计算核心，能够同时处理大量数据，而CPU的核心数量相对较少，每核处理能力虽强但并行能力有限，所以对于需要大量并行处理的任务，如大规模矩阵乘法、图像处理、或深度学习模型的训练，GPU将应该表现出显著优于CPU的性能。
+
+CPU的设计优化了单线程的计算速度和效率，时钟频率通常高于GPU，适合处理需要快速响应和复杂逻辑决策的任务。所以在高依赖单线程性能的应用中，如某些类型的数据分析和应用程序逻辑，CPU可能会优于GPU。
 
 ## Part 2 - Design and Implement
 
@@ -351,7 +353,7 @@ TEST_F(MatrixMultiplicationTest, OutputDimensionMismatchTest){·······(略
 
 ### 3.2 CPU vs GPU
 
-> 代码见benchmark.cu（已上交）、CMakeLists.txt（详见github仓库）
+> 代码见benchmark.cu（已上交）、CMakeLists.txt（详见报告开头或github仓库）
 
 这里利用服务器新增的git，从github clone了google benchmark仓库，再利用Cmake链接，最后进行单元基准测试。测试的范围为以32为步长的[32,4096]区间。
 
@@ -418,4 +420,403 @@ CUDA工具包中提供了一个功能正确性检查套件` Compute Sanitizer `�
    通过这次project，我了解了CUDA这种技术尤其适用于需要大量计算和数据处理的任务，如深度学习和机器学习等等。CUDA作为一种通用的并行计算框架，其应用远不止矩阵乘法和传统意义上的“图形处理”。其能力涵盖了从科学研究到商业应用的广泛领域，为处理大规模计算任务提供了强大的加速能力。随着技术的发展和更多领域的探索，我认为CUDA的应用将更加广泛。
 
 ## Part 5 - Source Code
+
+### matrix.h
+
+```c++
+//matrix.h
+#ifndef MATRIX_H
+#define MATRIX_H
+
+#include <iostream>
+#include <cuda_runtime.h>
+#include <random>
+template <typename T>
+class Matrix
+{
+public:
+    size_t rows;
+    size_t cols;
+    T *data;       
+    T *data_device; 
+
+    // Constructor
+    Matrix() : rows(0), cols(0), data(nullptr), data_device(nullptr) {}
+    Matrix(size_t r, size_t c) : rows(r), cols(c), data(nullptr), data_device(nullptr)
+    {
+        size_t len = r * c;
+        if (len == 0)
+        {
+            std::cerr << "Invalid size. The input should be > 0." << std::endl;
+            throw std::invalid_argument("Matrix dimensions should be greater than 0.");
+        }
+        data = (T *)malloc(len * sizeof(T));
+        if (data == nullptr)
+        {
+            std::cerr << "Allocate host memory failed." << std::endl;
+            throw std::bad_alloc();
+        }
+        memset(data, 0, len * sizeof(T));
+
+        cudaError_t status = cudaMalloc(&data_device, len * sizeof(T));
+        if (status != cudaSuccess)
+        {
+            std::cerr << "Allocate device memory failed." << std::endl;
+            free(data);
+            throw std::bad_alloc();
+        }
+        cudaMemset(data_device, 0, len * sizeof(T));
+    }
+
+    // Destructor
+    ~Matrix()
+    {
+        free(data);
+        cudaFree(data_device);
+    }
+
+    // Set all elements to the same value
+    void set(T value)
+    {
+        size_t len = rows * cols;
+        for (size_t i = 0; i < len; i++)
+        {
+            data[i] = value;
+        }
+        // Also update GPU memory
+        cudaMemcpy(data_device, data, len * sizeof(T), cudaMemcpyHostToDevice);
+    }
+
+    // Randomize matrix elements
+    void randomize()
+    {
+        std::random_device rd;                          // Obtain a random number from hardware
+        std::mt19937 gen(rd());                         // Seed the generator
+        std::uniform_real_distribution<> dis(0.0, 1.0); // Define the range
+
+        size_t len = rows * cols;
+        for (size_t i = 0; i < len; i++)
+        {
+            data[i] = static_cast<T>(dis(gen)); // Generate random float number and assign it
+        }
+        // Copy updated data to GPU memory
+        cudaMemcpy(data_device, data, len * sizeof(T), cudaMemcpyHostToDevice);
+    }
+
+    // Print matrix elements
+    void print() const
+    {
+        for (size_t i = 0; i < rows; i++)
+        {
+            for (size_t j = 0; j < cols; j++)
+            {
+                std::cout << data[i * cols + j] << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    // Overload << operator for output
+    friend std::ostream &operator<<(std::ostream &os, const Matrix &mat)
+    {
+        for (size_t i = 0; i < mat.rows; i++)
+        {
+            for (size_t j = 0; j < mat.cols; j++)
+            {
+                os << mat.data[i * mat.cols + j] << " ";
+            }
+            os << std::endl;
+        }
+        return os;
+    }
+
+    // Overload >> operator for input
+    friend std::istream &operator>>(std::istream &is, Matrix &mat)
+    {
+        for (size_t i = 0; i < mat.rows * mat.cols; i++)
+        {
+            is >> mat.data[i];
+        }
+        // Also update GPU memory
+        cudaMemcpy(mat.data_device, mat.data, mat.rows * mat.cols * sizeof(T), cudaMemcpyHostToDevice);
+        return is;
+    }
+
+    size_t getRows() const { return rows; }
+    size_t getCols() const { return cols; }
+};
+
+template <typename T>
+bool mulAddCPU(const Matrix<T> &pMatA, T a, T b, Matrix<T> &pSptB);
+
+template <typename T>
+__global__ void mulAddKernel(const T *inputA, T a, T b, T *outputB, size_t len);
+
+template <typename T>
+bool mulAddGPU(const Matrix<T> &pMatA, T a, T b, Matrix<T> &pMatB);
+
+bool mulMatrixCPU(const Matrix<float> &matA, const Matrix<float> &matB, Matrix<float> &matC);
+
+bool mulMatrixGPU(const Matrix<float> &matA, const Matrix<float> &matB, Matrix<float> &matC);
+
+bool mul(const Matrix<float> &lhs, const Matrix<float> &rhs, Matrix<float> &result);
+
+#endif // MATRIX_H
+```
+
+### mulAdd.cu
+
+```C++
+#include <cstdio>
+#include <iostream>
+#include <sstream>
+#include <cuda_runtime.h>
+#include <sys/time.h>
+#include "matrix.h"
+
+#define TIME_START gettimeofday(&t_start, NULL);
+#define TIME_END(name)                                         \
+    gettimeofday(&t_end, NULL);                                \
+    elapsedTime = (t_end.tv_sec - t_start.tv_sec) * 1000.0;    \
+    elapsedTime += (t_end.tv_usec - t_start.tv_usec) / 1000.0; \
+    printf(#name " Time = %f ms.\n", elapsedTime);
+
+template <typename T>
+bool mulAddCPU(const Matrix<T> &MatA, T a, T b, Matrix<T> &MatB)
+{
+    if (MatA.data == nullptr || MatB.data == nullptr)
+    {
+        fprintf(stderr, "Null pointer.\n");
+        return false;
+    }
+    if (MatA.rows != MatB.rows || MatA.cols != MatB.cols)
+    {
+        fprintf(stderr, "The input and output matrices are not the same size.\n");
+        return false;
+    }
+
+    size_t len = MatA.rows * MatA.cols;
+    for (int i = 0; i < len; i++)
+    {
+        MatB.data[i] = MatA.data[i] * a + b;
+    }
+    return true;
+}
+
+template <typename T>
+__global__ void mulAddKernel(const T *inputA, T a, T b, T *outputB, size_t len)
+{
+    int i = blockDim.x * blockIdx.x + threadIdx.x;
+    if (i < len)
+    {
+        outputB[i] = inputA[i] * a + b;
+    }
+}
+
+template <typename T>
+bool mulAddGPU(const Matrix<T> &MatA, T a, T b, Matrix<T> &MatB)
+{
+    if (MatA.data == nullptr || MatB.data == nullptr)
+    {
+        fprintf(stderr, "Null pointer.\n");
+        return false;
+    }
+    if (MatA.rows != MatB.rows || MatA.cols != MatB.cols)
+    {
+        fprintf(stderr, "The input and output matrices are not the same size.\n");
+        return false;
+    }
+
+    cudaError_t ecode = cudaSuccess;
+    size_t len = MatA.rows * MatA.cols;
+
+    cudaMemcpy(MatA.data_device, MatA.data, sizeof(T) * len, cudaMemcpyHostToDevice);
+    mulAddKernel<<<(len + 255) / 256, 256>>>(MatA.data_device, a, b, MatB.data_device, len);
+    if ((ecode = cudaGetLastError()) != cudaSuccess)
+    {
+        fprintf(stderr, "CUDA Error: %s\n", cudaGetErrorString(ecode));
+        return false;
+    }
+    cudaMemcpy(MatB.data, MatB.data_device, sizeof(T) * len, cudaMemcpyDeviceToHost);
+
+    return true;
+}
+
+int main()
+{
+    struct timeval t_start, t_end;
+    double elapsedTime = 0;
+
+    int rows, cols;
+    std::string input;
+
+    while (true)
+    {
+        std::cout << "Please input the size of the matrix (rows cols) or 'quit' to exit: ";
+        std::getline(std::cin, input); 
+
+        if (input == "quit")
+        {
+            break; 
+        }
+
+        std::istringstream iss(input);
+        if (!(iss >> rows >> cols))
+        {
+            std::cerr << "Invalid input.\n";
+            continue;
+        }
+
+        Matrix<float> matA(rows, cols);
+        Matrix<float> matB(rows, cols);
+        matA.set(1.0);
+        matB.set(0.0);
+
+        TIME_START;
+        mulAddCPU<float>(matA, 2.0, 3.0, matB);
+        TIME_END(CPU);
+        // matB.print();
+
+        TIME_START;
+        mulAddGPU<float>(matA, 2.0, 3.0, matB);
+        TIME_END(GPU);
+        // matB.print();
+    }
+    return 0;
+}
+```
+
+### mul.cu
+
+```C++
+#include "matrix.h"
+#include <cublas_v2.h>
+#include <cblas.h>
+#include <iostream>
+
+// 使用 cblas 库在 CPU 上计算矩阵乘法
+bool mulMatrixCPU(const Matrix<float> &lhs, const Matrix<float> &rhs, Matrix<float> &dst)
+{
+    if (lhs.data == nullptr || rhs.data == nullptr || dst.data == nullptr)
+    {
+        std::cerr << "Null pointer.\n";
+        return false;
+    }
+
+    if (lhs.cols != rhs.rows)
+    {
+        std::cerr << "Incompatible dimensions for multiplication: A.cols != B.rows\n";
+        return false;
+    }
+    if (dst.rows != lhs.rows || dst.cols != rhs.cols)
+    {
+        std::cerr << "Output matrix dimensions do not match the product dimensions.\n";
+        return false;
+    }
+
+    const float alpha = 1.0f;
+    const float beta = 0.0f;
+
+    cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, lhs.rows, rhs.cols, lhs.cols,
+                alpha, lhs.data, lhs.cols, rhs.data, rhs.cols,
+                beta, dst.data, dst.cols);
+
+    return true;
+}
+
+// 使用 cuBLAS 库在 GPU 上计算矩阵乘法
+bool mulMatrixGPU(const Matrix<float> &lhs, const Matrix<float> &rhs, Matrix<float> &dst)
+{
+    if (lhs.data == nullptr || rhs.data == nullptr || dst.data == nullptr)
+    {
+        std::cerr << "Null pointer.\n";
+        return false;
+    }
+
+    if (lhs.cols != rhs.rows)
+    {
+        std::cerr << "Incompatible dimensions for multiplication: A.cols != B.rows\n";
+        return false;
+    }
+    if (dst.rows != lhs.rows || dst.cols != rhs.cols)
+    {
+        std::cerr << "Output matrix dimensions do not match the product dimensions.\n";
+        return false;
+    }
+
+    const float alpha = 1.0f;
+    const float beta = 0.0f;
+    cublasHandle_t handle;
+    cublasStatus_t status = cublasCreate(&handle);
+    if (status != CUBLAS_STATUS_SUCCESS)
+    {
+        std::cerr << "CUBLAS initialization failed\n";
+        return false;
+    }
+
+    status = cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, rhs.cols, lhs.rows, lhs.cols,
+                         &alpha, rhs.data_device, rhs.cols, lhs.data_device, rhs.rows,
+                         &beta, dst.data_device, dst.cols);
+    if (status != CUBLAS_STATUS_SUCCESS)
+    {
+        std::cerr << "CUBLAS SGEMM failed\n";
+        cublasDestroy(handle);
+        return false;
+    }
+
+    cudaMemcpy(dst.data, dst.data_device, sizeof(float) * dst.rows * dst.cols, cudaMemcpyDeviceToHost);
+    cublasDestroy(handle);
+    return true;
+}
+```
+
+### benchmark.cu
+
+```C++
+#include "benchmark/benchmark.h"
+#include <functional>
+#include "matrix.h" 
+
+using namespace std;
+using func_t = function<bool(const Matrix<float>&, const Matrix<float>&, Matrix<float>&)>;
+
+// Executor 类用于执行测试
+class Executor {
+public:
+    explicit Executor(func_t func) : func(std::move(func)) {}
+
+    void execute(benchmark::State &state) {
+        const size_t N = state.range(0);
+
+        Matrix<float> lhs(N, N);
+        Matrix<float> rhs(N, N);
+        Matrix<float> dst(N, N);
+
+        lhs.randomize();
+        rhs.randomize();
+
+        for (auto _ : state) {
+            func(lhs, rhs, dst);
+            benchmark::DoNotOptimize(dst.data);
+            benchmark::DoNotOptimize(dst.data_device);
+            benchmark::ClobberMemory();
+        }
+        state.SetComplexityN(state.range(0));
+    }
+private:
+    func_t func;
+};
+
+#define ADD_BENCHMARK(FUNC, BENCHMARK_NAME) \
+    static void BENCHMARK_NAME(benchmark::State &state) { \
+        Executor(FUNC).execute(state); \
+        state.SetComplexityN(state.range(0)); \
+    } \
+    BENCHMARK(BENCHMARK_NAME)->DenseRange(32, 4096, 32)->Complexity(benchmark::oNCubed);
+
+ADD_BENCHMARK(mulMatrixCPU, BM_MulMatrixCPU);
+ADD_BENCHMARK(mulMatrixGPU, BM_MulMatrixGPU);
+
+BENCHMARK_MAIN();
+```
 
