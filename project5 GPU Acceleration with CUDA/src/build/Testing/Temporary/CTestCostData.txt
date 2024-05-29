@@ -1,0 +1,6 @@
+MatrixMultiplicationTest.TestCPUImplementation 1 0.467495
+MatrixMultiplicationTest.TestGPUImplementation 1 0.579363
+MatrixMultiplicationTest.NullPointerTest 1 0.49628
+MatrixMultiplicationTest.DimensionMismatchTest 1 0.426626
+MatrixMultiplicationTest.OutputDimensionMismatchTest 1 0.520101
+---

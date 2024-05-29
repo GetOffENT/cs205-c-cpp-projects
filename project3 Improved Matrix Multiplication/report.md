@@ -1,6 +1,6 @@
 
 
-# CS205 C/ C++ Programming-Calculator
+# CS205 C/ C++ Improved Matrix Multiplication
 
 **Name**: 吴宇贤
 
@@ -9,6 +9,8 @@
 [toc]
 
 上交文档：mul.c、matrix.c、matrix.h、report.pdf、benchmark.cpp
+
+[git仓库](https://github.com/GetOffENT/cs205-c-cpp-projects/tree/main/project3 Improved Matrix Multiplication)点此
 
 > 这里cpp文件**仅用于**google benchmark的基准测试，project中所有要求的算法均为**C语言**实现。
 

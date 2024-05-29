@@ -1,0 +1,5 @@
+if(EXISTS "/home/wyx/cs203/projects/project4 A Class to Describe a Matrix/src/build/main[1]_tests.cmake")
+  include("/home/wyx/cs203/projects/project4 A Class to Describe a Matrix/src/build/main[1]_tests.cmake")
+else()
+  add_test(main_NOT_BUILT main_NOT_BUILT)
+endif()

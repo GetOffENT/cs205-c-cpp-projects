@@ -1,0 +1,3 @@
+/data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build/_deps/googletest-subbuild/CMakeFiles/googletest-populate.dir
+/data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build/_deps/googletest-subbuild/CMakeFiles/edit_cache.dir
+/data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build/_deps/googletest-subbuild/CMakeFiles/rebuild_cache.dir

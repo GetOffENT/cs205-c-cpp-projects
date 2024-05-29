@@ -1,0 +1,150 @@
+Start testing: May 30 00:08 CST
+----------------------------------------------------------
+1/5 Testing: MatrixMultiplicationTest.TestCPUImplementation
+1/5 Test: MatrixMultiplicationTest.TestCPUImplementation
+Command: "/data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build/mul_test" "--gtest_filter=MatrixMultiplicationTest.TestCPUImplementation" "--gtest_also_run_disabled_tests"
+Directory: /data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build
+"MatrixMultiplicationTest.TestCPUImplementation" start time: May 30 00:08 CST
+Output:
+----------------------------------------------------------
+Running main() from /data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = MatrixMultiplicationTest.TestCPUImplementation
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MatrixMultiplicationTest
+[ RUN      ] MatrixMultiplicationTest.TestCPUImplementation
+[       OK ] MatrixMultiplicationTest.TestCPUImplementation (303 ms)
+[----------] 1 test from MatrixMultiplicationTest (303 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (303 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.47 sec
+----------------------------------------------------------
+Test Passed.
+"MatrixMultiplicationTest.TestCPUImplementation" end time: May 30 00:08 CST
+"MatrixMultiplicationTest.TestCPUImplementation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/5 Testing: MatrixMultiplicationTest.TestGPUImplementation
+2/5 Test: MatrixMultiplicationTest.TestGPUImplementation
+Command: "/data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build/mul_test" "--gtest_filter=MatrixMultiplicationTest.TestGPUImplementation" "--gtest_also_run_disabled_tests"
+Directory: /data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build
+"MatrixMultiplicationTest.TestGPUImplementation" start time: May 30 00:08 CST
+Output:
+----------------------------------------------------------
+Running main() from /data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = MatrixMultiplicationTest.TestGPUImplementation
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MatrixMultiplicationTest
+[ RUN      ] MatrixMultiplicationTest.TestGPUImplementation
+[       OK ] MatrixMultiplicationTest.TestGPUImplementation (376 ms)
+[----------] 1 test from MatrixMultiplicationTest (376 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (376 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.58 sec
+----------------------------------------------------------
+Test Passed.
+"MatrixMultiplicationTest.TestGPUImplementation" end time: May 30 00:08 CST
+"MatrixMultiplicationTest.TestGPUImplementation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/5 Testing: MatrixMultiplicationTest.NullPointerTest
+3/5 Test: MatrixMultiplicationTest.NullPointerTest
+Command: "/data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build/mul_test" "--gtest_filter=MatrixMultiplicationTest.NullPointerTest" "--gtest_also_run_disabled_tests"
+Directory: /data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build
+"MatrixMultiplicationTest.NullPointerTest" start time: May 30 00:08 CST
+Output:
+----------------------------------------------------------
+Running main() from /data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = MatrixMultiplicationTest.NullPointerTest
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MatrixMultiplicationTest
+[ RUN      ] MatrixMultiplicationTest.NullPointerTest
+Null pointer.
+Null pointer.
+Null pointer.
+Null pointer.
+Null pointer.
+Null pointer.
+[       OK ] MatrixMultiplicationTest.NullPointerTest (317 ms)
+[----------] 1 test from MatrixMultiplicationTest (317 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (317 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.50 sec
+----------------------------------------------------------
+Test Passed.
+"MatrixMultiplicationTest.NullPointerTest" end time: May 30 00:08 CST
+"MatrixMultiplicationTest.NullPointerTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/5 Testing: MatrixMultiplicationTest.DimensionMismatchTest
+4/5 Test: MatrixMultiplicationTest.DimensionMismatchTest
+Command: "/data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build/mul_test" "--gtest_filter=MatrixMultiplicationTest.DimensionMismatchTest" "--gtest_also_run_disabled_tests"
+Directory: /data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build
+"MatrixMultiplicationTest.DimensionMismatchTest" start time: May 30 00:08 CST
+Output:
+----------------------------------------------------------
+Running main() from /data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = MatrixMultiplicationTest.DimensionMismatchTest
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MatrixMultiplicationTest
+[ RUN      ] MatrixMultiplicationTest.DimensionMismatchTest
+Incompatible dimensions for multiplication: A.cols != B.rows
+Incompatible dimensions for multiplication: A.cols != B.rows
+Incompatible dimensions for multiplication: A.cols != B.rows
+Incompatible dimensions for multiplication: A.cols != B.rows
+[       OK ] MatrixMultiplicationTest.DimensionMismatchTest (269 ms)
+[----------] 1 test from MatrixMultiplicationTest (269 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (269 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.43 sec
+----------------------------------------------------------
+Test Passed.
+"MatrixMultiplicationTest.DimensionMismatchTest" end time: May 30 00:08 CST
+"MatrixMultiplicationTest.DimensionMismatchTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/5 Testing: MatrixMultiplicationTest.OutputDimensionMismatchTest
+5/5 Test: MatrixMultiplicationTest.OutputDimensionMismatchTest
+Command: "/data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build/mul_test" "--gtest_filter=MatrixMultiplicationTest.OutputDimensionMismatchTest" "--gtest_also_run_disabled_tests"
+Directory: /data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build
+"MatrixMultiplicationTest.OutputDimensionMismatchTest" start time: May 30 00:08 CST
+Output:
+----------------------------------------------------------
+Running main() from /data/S12212614/projects/project5 GPU Acceleration with CUDA/src/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = MatrixMultiplicationTest.OutputDimensionMismatchTest
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MatrixMultiplicationTest
+[ RUN      ] MatrixMultiplicationTest.OutputDimensionMismatchTest
+Output matrix dimensions do not match the product dimensions.
+Output matrix dimensions do not match the product dimensions.
+[       OK ] MatrixMultiplicationTest.OutputDimensionMismatchTest (324 ms)
+[----------] 1 test from MatrixMultiplicationTest (324 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (324 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.52 sec
+----------------------------------------------------------
+Test Passed.
+"MatrixMultiplicationTest.OutputDimensionMismatchTest" end time: May 30 00:08 CST
+"MatrixMultiplicationTest.OutputDimensionMismatchTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: May 30 00:08 CST

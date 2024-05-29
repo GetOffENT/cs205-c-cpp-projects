@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/mul_test.dir/mul_test.cu.o CMakeFiles/mul_test.dir/mul.cu.o -o mul_test   -L/usr/local/cuda/targets/x86_64-linux/lib/stubs  -L/usr/local/cuda/targets/x86_64-linux/lib  lib/libgtest_main.a -lopenblas -lcublas lib/libgtest.a -lcudadevrt -lcudart_static -lrt -lpthread -ldl 
